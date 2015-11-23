@@ -18,7 +18,7 @@ describe "Querying" do
   end
 
   it "collect all of the likes on the posts of a user with email ( domenick.spinka@gmail.com )" do
-    result = "your query"
+    result = User.find_by(:email => "domenick.spinka@gmail.com").posts.collect(&:likes).flatten
 
     ###################
     # DO NOT CODE BELOW THIS
@@ -33,7 +33,7 @@ describe "Querying" do
   end
 
   it "collect all of the posts alice@gmail.com commented on" do
-    result = "your query"
+    result = User.find_by(:email => "alice@gmail.com").comments.map(&:post)
 
     ###################
     # DO NOT CODE BELOW THIS
@@ -48,7 +48,9 @@ describe "Querying" do
   end
 
   it "collect all of the users who commented on dorian.breitenberg@gmail.com's posts" do
-    result = "your query"
+    result = User.find_by(:email => "dorian.breitenberg@gmail.com").posts.map do |post|
+      post.comments.map(&:user)
+    end.flatten
 
     ###################
     # DO NOT CODE BELOW THIS
@@ -63,8 +65,8 @@ describe "Querying" do
   end
 
   it "collect posts with more than 2 likes" do
-    result = "your query"
-
+    result = Post.select { |post| post.likes.count > 2 }
+    
     ###################
     # DO NOT CODE BELOW THIS
     ##################
@@ -79,7 +81,9 @@ describe "Querying" do
   end
 
   it "create a like record by alice@gmail.com on any one of edd@gmail.com's post" do
-
+    
+    User.find_by(:email => "edd@gmail.com").posts.first.likes.create( :user => User.find_by(:email => "alice@gmail.com"))
+    
     ###################
     # DO NOT CODE BELOW THIS
     ##################
@@ -94,7 +98,11 @@ describe "Querying" do
 
   it "Return a post commented by domenick.spinka@gmail.com and liked by dorian.breitenberg@gmail.com" do
     # Your query goes here. You can assign variable etc until you find the post you need.
-    result = "your query"
+    
+    result = Post.select do |post|
+      !post.comments.select {|comment| comment.user.email == "domenick.spinka@gmail.com"}.empty? &&
+      !post.likes.select {|like| like.user.email == "dorian.breitenberg@gmail.com"}.empty?
+    end.first
 
     ###################
     # DO NOT CODE BELOW THIS
